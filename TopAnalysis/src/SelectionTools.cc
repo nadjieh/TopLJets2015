@@ -37,17 +37,18 @@ TString SelectionTool::flagFinalState(MiniEvent_t &ev, std::vector<Particle> pre
   photons_.clear();
   vetoLeptons_.clear();
   jets_.clear();
-
+  lowPtPhotons.clear();
   //if no set of pre-selected leptons has been passed, use standard top selections
   if(preselLeptons.size()==0) preselLeptons=flaggedLeptons(ev);
-  if(preselPhotons.size()==0) preselPhotons=flaggedPhotons(ev);
-
+  if(preselPhotons.size()==0) preselPhotons=flaggedPhotons(ev,50.);
+  std::vector<Particle> preselPhotonLowPt = flaggedPhotons(ev,30.);
   //decide the channel based on the lepton multiplicity and set lepton collections
   std::vector<Particle> tightLeptons( selLeptons(preselLeptons,TIGHT) );
   std::vector<Particle> tightPhotons( selPhotons(preselPhotons,offlinePhoton_, tightLeptons) );
   std::vector<Particle> inclusivePhotons( selPhotons(preselPhotons,CONTROL, tightLeptons) );
   tmpPhotons          = selPhotons(preselPhotons,QCDTEMP, tightLeptons);
   relaxedTightPhotons = selPhotons(preselPhotons,RELAXEDTIGHT, tightLeptons);
+  lowPtPhotons = selPhotons(preselPhotonLowPt,offlinePhoton_,tightLeptons);
   std::vector<Particle> fakePhotons;
   for(auto a : inclusivePhotons) {
     int idx = a.originalReference();
@@ -296,7 +297,7 @@ std::vector<Particle> SelectionTool::selLeptons(std::vector<Particle> &leptons,i
 }
 
 //
-std::vector<Particle> SelectionTool::flaggedPhotons(MiniEvent_t &ev)
+std::vector<Particle> SelectionTool::flaggedPhotons(MiniEvent_t &ev, double minPt)
 {
   //leptons
   std::vector<Particle> photons;
@@ -308,7 +309,7 @@ std::vector<Particle> SelectionTool::flaggedPhotons(MiniEvent_t &ev)
     //see bits in plugins/MiniAnalyzer.cc
 
     int qualityFlagsWord(0);
-    if( pt>50 && eta<2.4)
+    if( pt>minPt && eta<2.4)
       {
         if( (pid&0x7f)==0x7f )            qualityFlagsWord |= (0x1 << LOOSE);
         if( ((pid>>10)&0x7f)==0x7f   )    qualityFlagsWord |= (0x1 << MEDIUM);

@@ -159,7 +159,7 @@ private:
         float vbfmva,vbffisher;
         bool doBlindAnalysis;
 
-	std::vector<Particle> relaxedTightPhotons, photons, tmpPhotons; 
+	std::vector<Particle> relaxedTightPhotons, photons, tmpPhotons, lowPtA; 
 	/////////////////////////////////////
 	// Categorie for VBF:              //
 	//   MM:A:VBF:HighPt:HighPtVBF:V1J // 

@@ -194,7 +194,7 @@ def showTF(tf,outDir):
     nlo2lo.GetYaxis().SetTitleSize(0.08)
     nlo2lo.GetYaxis().SetTitleOffset(0.8)
     nlo2lo.GetYaxis().SetLabelSize(0.08)
-    nlo2lo.GetYaxis().SetRangeUser(0.01,5)
+    nlo2lo.GetYaxis().SetRangeUser(0.01,2)
     data2lo.Draw('e1same')
     data2nlo.Draw('e1same')
 
@@ -228,7 +228,7 @@ def showTF(tf,outDir):
     p2.cd()
     data2lo_A.Draw('e1')
     data2lo_A.GetYaxis().SetNdivisions(5)
-    data2lo_A.GetYaxis().SetRangeUser(0.01,5)
+    data2lo_A.GetYaxis().SetRangeUser(0.01,2)
     data2lo_A.GetXaxis().SetTitleSize(0.08)
     data2lo_A.GetXaxis().SetLabelSize(0.08)
     data2lo_A.GetYaxis().SetTitleSize(0.08)
