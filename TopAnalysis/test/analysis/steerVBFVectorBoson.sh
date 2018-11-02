@@ -2,7 +2,6 @@
 
 WHAT=$1; 
 EXTRA=$2
-QCD=$3
 if [ "$#" -lt 1 ]; then 
     echo "steerVBFVectorBoson.sh <SEL/MERGE/PLOT/WWW> [extra]";
     echo "        SEL          - launches selection jobs to the batch, output will contain summary trees and control plots"; 
@@ -14,15 +13,10 @@ fi
 
 #to run locally use local as queue + can add "--njobs 8" to use 8 parallel jobs
 queue=workday
-githash=fbc74ae
-eosdir=/store/cmst3/group/top/RunIIFall17/${githash}
-githash2018=4ad3a45
-eosdir2018=/store/cmst3/group/top/RunIISpring18/${githash2018}
-githashJetHT=dc6c6d0
-eosdirJetHT=/store/cmst3/user/ajafari/RunIIFall17/${githashJetHT}
+githash=f93b8d8
+eosdir=/store/cmst3/group/top/RunIIReReco/${githash}
 fulllumi=41367
 vbflumi=7661
-fulllumi2018=5300
 lumiUnc=0.025
 outdir=${CMSSW_BASE}/src/TopLJets2015/TopAnalysis/test/analysis/VBFVectorBoson
 wwwdir=~/www/VBFVectorBoson
@@ -37,9 +31,9 @@ case $WHAT in
         # output=MC13TeV_DY4Jets50toInf.root
         # tag="--tag MC13TeV_DY50toInf"
 
-        input=${eosdir}/Data13TeV_SinglePhoton_2017D/MergedMiniEvents_4_ext0.root #/MC13TeV_AJJ_EWK_INT_LO_mjj500_dr04/MC13TeV_AJJ_EWK_INT_LO_mjj500_dr04.root
-        output=Data13TeV_SinglePhoton_2017D.root #MC13TeV_AJJ_EWK_INT_LO_mjj500_dr04.root
-        tag="--tag Data13TeV_SinglePhoton_2017D" #MC13TeV_AJJ_EWK_INT_LO_mjj500_dr04"
+        input=${eosdir}/Data13TeV_2017C_SinglePhoton/MergedMiniEvents_0_ext0.root
+        output=Data13TeV_2017C_SinglePhoton.root #MC13TeV_AJJ_EWK_INT_LO_mjj500_dr04.root
+        tag="--tag Data13TeV_2017C_SinglePhoton" #MC13TeV_AJJ_EWK_INT_LO_mjj500_dr04"
 
         #input=${eosdir}/Data13TeV_SinglePhoton_2017F/MergedMiniEvents_0_ext0.root
         #output=Data13TeV_SinglePhoton_2017F.root
@@ -71,8 +65,13 @@ case $WHAT in
         #extraOpts=" --mvatree"
 
     SEL2018 )
-	python scripts/runLocalAnalysis.py -i ${eosdir2018} \
-            -o ${outdir}/${githash2018}/raw2018 \
+	python scripts/runLocalAnalysis.py -i /store/cmst3/group/top/RunIISpring18/f3174df\
+            -o ${outdir}/2018/raw \
+            -q ${queue} \
+            --era era2017 -m VBFVectorBoson::RunVBFVectorBoson --ch 0 --runSysts;
+
+	python scripts/runLocalAnalysis.py -i /store/cmst3/group/top/RunIISpring18/hem1516_failure\
+            -o ${outdir}/2018/hem1516_failure \
             -q ${queue} \
             --era era2017 -m VBFVectorBoson::RunVBFVectorBoson --ch 0 --runSysts;
 	;;
@@ -80,20 +79,20 @@ case $WHAT in
     SELJETHT )
 	json=data/era2017/JetHT.json;
 	extraOpts=" --CR"
-	echo ${QCD} 
-	if [ ${QCD} == "QCDTemp" ]; then
+	echo ${EXTRA} 
+	if [ ${EXTRA} == "QCDTemp" ]; then
 	    echo 'I do QCD Template photon selection'
 	    extraOpts=${extraOpts}" --QCDTemp"
 	fi
-        if [ ${QCD} == "SRfake" ]; then
+        if [ ${EXTRA} == "SRfake" ]; then
             echo 'I do SRfake photon selection'
             extraOpts=" --SRfake"
         fi
 	python scripts/runLocalAnalysis.py \
-	    -i ${eosdirJetHT} \
-            -o ${outdir}/${githashJetHT}/${EXTRA} \
-            --farmappendix ${githashJetHT} \
-            -q ${queue} --genWeights genweights_${githashJetHT}.root \
+	    -i ${eosdir} \
+            -o ${outdir}/${githash}${EXTRA} \
+            --farmappendix ${githash}${EXTRA} \
+            -q ${queue} --genWeights genweights_${githash}.root \
             --era era2017 -m VBFVectorBoson::RunVBFVectorBoson --ch 0 --only ${json} --runSysts ${extraOpts};
 	;;
 
@@ -114,6 +113,16 @@ case $WHAT in
 	fi
 	./scripts/mergeOutputs.py ${outdir}/${gh}/${EXTRA};
 	;;
+
+    PLOT2018)
+         commonOpts="-i test/analysis/VBFVectorBoson/2018/hem1516_failure/ --puNormSF puwgtctr -l 1.0"
+         python scripts/plotter.py ${commonOpts} -j test/analysis/VBFVectorBoson/2018/hem1516_failure/samples.json --only V1J;
+         fdir=${wwwdir}/hem1516_failure;
+	 mkdir -p ${fdir}
+	 cp test/analysis/VBFVectorBoson/2018/hem1516_failure/plots/*.{png,pdf,dat} ${fdir};
+	 cp test/index.php ${fdir};
+         echo "Check plots in ${fdir}"
+        ;;
 
     PLOT )
         json=data/era2017/vbf_samples.json;

@@ -142,8 +142,9 @@ private:
 	EfficiencyScaleFactorsWrapper * gammaEffWR;
   
   	//JEC/JER
-  	JECTools * jec;
-	//Photon/Z pt weights
+  	//JECTools * jec;
+	
+        //Photon/Z pt weights
   	std::map<TString,TGraph *> photonPtWgts;
   	std::map<TString,std::pair<double,double> > photonPtWgtCtr;
 
@@ -155,11 +156,13 @@ private:
 	float evtWeight, mjj, detajj , dphijj ,jjpt;
 	float isotropy, circularity,sphericity,	aplanarity, C, D;
 	float scalarht,balance, mht, training;
-        float leadj_gawidth,leadj_c1_05,subleadj_gawidth,subleadj_c1_05, subleadj_c2_02, subleadj_pt;
+        float leadj_c1_05,subleadj_c1_05;
+        float leadj_gawidth,subleadj_gawidth, subleadj_c2_02, subleadj_pt;
         float vbfmva,vbffisher;
         bool doBlindAnalysis;
 
 	std::vector<Particle> relaxedTightPhotons, photons, tmpPhotons, lowPtA; 
+
 	/////////////////////////////////////
 	// Categorie for VBF:              //
 	//   MM:A:VBF:HighPt:HighPtVBF:V1J // 

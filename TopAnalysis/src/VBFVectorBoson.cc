@@ -114,7 +114,7 @@ void VBFVectorBoson::RunVBFVectorBoson()
       //////////////////
       // CORRECTIONS //
       ////////////////      
-      jec->smearJetEnergies(ev);
+      //jec->smearJetEnergies(ev);
              
       ///////////////////////////
       // RECO LEVEL SELECTION //
@@ -520,15 +520,9 @@ void VBFVectorBoson::bookHistograms(){
   ht->addHist("allMjjEE",           new TH2F("allMjjEE",";All #sigma_{i#etai#eta}; m_{jj} (GeV)",100,0,0.05,4,bins));
   ht->addHist("tmpQCDMjjEE",        new TH2F("tmpQCDMjjEE",";All #sigma_{i#etai#eta}; m_{jj} (GeV)",100,0,0.05,4,bins));
   // Study of jet variables
-  ht->addHist("jet_c1_00", 	  new TH1F("jet_c1_00",          ";Jet shape var. c1_00;Jets",100,-1,1));  
-  ht->addHist("jet_c1_02", 	  new TH1F("jet_c1_02",          ";Jet shape var. c1_02;Jets",100,-1,1));  
-  ht->addHist("jet_c1_05", 	  new TH1F("jet_c1_05",          ";Jet shape var. c1_05;Jets",100,-1,1));  
   ht->addHist("jet_c2_00", 	  new TH1F("jet_c2_00",          ";Jet shape var. c2_00;Jets",100,-1,1));  
   ht->addHist("jet_c2_02", 	  new TH1F("jet_c2_02",          ";Jet shape var. c2_02;Jets",100,-1,1));  
   ht->addHist("jet_c2_05", 	  new TH1F("jet_c2_05",          ";Jet shape var. c2_05;Jets",100,-1,1));  
-  ht->addHist("jet_c3_00", 	  new TH1F("jet_c3_00",          ";Jet shape var. c3_00;Jets",100,-1,1));  
-  ht->addHist("jet_c3_02", 	  new TH1F("jet_c3_02",          ";Jet shape var. c3_02;Jets",100,-1,1));  
-  ht->addHist("jet_c3_05", 	  new TH1F("jet_c3_05",          ";Jet shape var. c3_05;Jets",100,-1,1));  
   ht->addHist("jet_zg", 	  new TH1F("jet_zg",          ";Jet shape var. zg;Jets",100,-1,1));  
   ht->addHist("jet_gaptd", 	  new TH1F("jet_gaptd",          ";Jet shape var. gaptd;Jets",100,-1,1));  
   ht->addHist("jet_gawidth",      new TH1F("jet_gawidth",          ";Jet shape var. gawidth;Jets",100,-1,1));
@@ -580,7 +574,7 @@ void VBFVectorBoson::loadCorrections(){
   fr = new FakeRateTool(era, "fakeRatios.root");
   lumi = new LumiTools(era,genPU);
   gammaEffWR = new EfficiencyScaleFactorsWrapper(filename.Contains("Data13TeV"),era);
-  jec = new JECTools(era);
+  //jec = new JECTools(era);
   if(anFlag>0) this->setGammaZPtWeights();
 }
 void VBFVectorBoson::addMVAvars(){
@@ -597,8 +591,8 @@ void VBFVectorBoson::addMVAvars(){
   newTree->Branch("forwardeta", &forwardeta);
   newTree->Branch("leadj_gawidth", &leadj_gawidth);
   newTree->Branch("subleadj_gawidth", &subleadj_gawidth);
-  newTree->Branch("leadj_c1_05", &leadj_c1_05);
-  newTree->Branch("subleadj_c1_05", &subleadj_c1_05);
+  //newTree->Branch("leadj_c1_05", &leadj_c1_05);
+  // newTree->Branch("subleadj_c1_05", &subleadj_c1_05);
   newTree->Branch("subleadj_c2_02", &subleadj_c2_02);
   newTree->Branch("jjetas", &jjetas);
   newTree->Branch("centjy", &centjy);
@@ -627,9 +621,9 @@ void VBFVectorBoson::initVariables(std::vector<Jet> jets){
   dphijj = (jets.size()>=2 ? jets[0].DeltaPhi(jets[1]) : -99.);
   jjpt   = (jets.size()>=2 ? (jets[0]+jets[1]).Pt() : 0.);
   leadj_gawidth    = (jets.size()>1 ? ev.j_gawidth[jets[0].getJetIndex()] : -99);
-  leadj_c1_05      = (jets.size()>1 ? ev.j_c1_05[jets[0].getJetIndex()] : -99);
+  //leadj_c2_05      = (jets.size()>1 ? ev.j_c2_05[jets[0].getJetIndex()] : -99);
   subleadj_gawidth = (jets.size()>2 ? ev.j_gawidth[jets[1].getJetIndex()] : -99);
-  subleadj_c1_05   = (jets.size()>2 ? ev.j_c1_05[jets[1].getJetIndex()] : -99);
+  //subleadj_c1_05   = (jets.size()>2 ? ev.j_c1_05[jets[1].getJetIndex()] : -99);
   subleadj_c2_02   = (jets.size()>2 ? ev.j_c2_02[jets[1].getJetIndex()] : -99);
   subleadj_pt      = (jets.size()>2 ? ev.j_pt[jets[1].getJetIndex()] : -99);
   ystar       = -99;
@@ -663,24 +657,24 @@ void VBFVectorBoson::fill(MiniEvent_t ev, TLorentzVector boson, std::vector<Jet>
     int idx = a.originalReference();
     ht->fill("allsihih",   ev.gamma_sieie[idx]             ,cplotwgts,c);
     if (fabs(ev.gamma_eta[idx]) < 1.442)
-      ht->fill("allMjjEB"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
+      ht->fill2D("allMjjEB"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
     else
-      ht->fill("allMjjEE"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
+      ht->fill2D("allMjjEE"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
   }
   for(auto a : relaxedTightPhotons) {
     int idx = a.originalReference();
     ht->fill("relaxedTightsihih",   ev.gamma_sieie[idx]             ,cplotwgts,c);
     if (fabs(ev.gamma_eta[idx]) < 1.442)
-      ht->fill("relaxedTightMjjEB"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
+      ht->fill2D("relaxedTightMjjEB"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
     else
-      ht->fill("relaxedTightMjjEE"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
+      ht->fill2D("relaxedTightMjjEE"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
   }
   for(auto a : tmpPhotons) {
     int idx = a.originalReference();
     if (fabs(ev.gamma_eta[idx]) < 1.442)
-      ht->fill("tmpQCDMjjEB"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
+      ht->fill2D("tmpQCDMjjEB"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
     else
-      ht->fill("tmpQCDMjjEE"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
+      ht->fill2D("tmpQCDMjjEE"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c); 
   }
   //bosons in CR and fakes
   for(auto a : fakeACR) {
@@ -690,9 +684,9 @@ void VBFVectorBoson::fill(MiniEvent_t ev, TLorentzVector boson, std::vector<Jet>
     ht->fill("fakeneutiso", ev.gamma_neutralHadronIso[idx]  ,cplotwgts,c);
     ht->fill("fakeaiso",    ev.gamma_photonIso[idx]         ,cplotwgts,c);
     if (fabs(ev.gamma_eta[idx]) < 1.442)
-      ht->fill("looseMjjEB"  ,  ev.gamma_sieie[idx], mjj        ,cplotwgts,c);
+      ht->fill2D("looseMjjEB"  ,  ev.gamma_sieie[idx], mjj        ,cplotwgts,c);
     else
-      ht->fill("looseMjjEE"  ,  ev.gamma_sieie[idx], mjj        ,cplotwgts,c);
+      ht->fill2D("looseMjjEE"  ,  ev.gamma_sieie[idx], mjj        ,cplotwgts,c);
   }
   for(auto a : tightACR) { 
     int idx = a.originalReference();
@@ -701,9 +695,9 @@ void VBFVectorBoson::fill(MiniEvent_t ev, TLorentzVector boson, std::vector<Jet>
     ht->fill("tightneutiso", ev.gamma_neutralHadronIso[idx]  ,cplotwgts,c);
     ht->fill("tightaiso",    ev.gamma_photonIso[idx]         ,cplotwgts,c);
     if (fabs(ev.gamma_eta[idx]) < 1.442)
-      ht->fill("tightMjjEB"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c);
+      ht->fill2D("tightMjjEB"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c);
     else
-      ht->fill("tightMjjEE"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c);
+      ht->fill2D("tightMjjEE"  ,   ev.gamma_sieie[idx], mjj        ,cplotwgts,c);
   }
   ht->fill("nloose",        fakeACR.size(),       cplotwgts,c);
   ht->fill("ntight",        tightACR.size(),      cplotwgts,c);
@@ -721,15 +715,9 @@ void VBFVectorBoson::fill(MiniEvent_t ev, TLorentzVector boson, std::vector<Jet>
     ht->fill(jtype+"pt",       jets[ij].Pt(),        cplotwgts,c);          
     ht->fill(jtype+"pumva",    jets[ij].getPUMVA(),  cplotwgts,c);
     ht->fill(Form("drj%db",(int)ij+1),   jets[ij].DeltaR(boson),  cplotwgts,c);
-    ht->fill("jet_c1_00", 	ev.j_c1_00[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
-    ht->fill("jet_c1_02", 	ev.j_c1_02[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
-    ht->fill("jet_c1_05", 	ev.j_c1_05[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
     ht->fill("jet_c2_00", 	ev.j_c2_00[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
     ht->fill("jet_c2_02", 	ev.j_c2_02[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
     ht->fill("jet_c2_05",	ev.j_c2_05[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
-    ht->fill("jet_c3_00", 	ev.j_c3_00[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
-    ht->fill("jet_c3_02",	ev.j_c3_02[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
-    ht->fill("jet_c3_05",	ev.j_c3_05[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
     ht->fill("jet_zg", 		ev.j_zg[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
     ht->fill("jet_gaptd", 	ev.j_gaptd[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
     ht->fill("jet_gawidth", ev.j_gawidth[jets[ij].getJetIndex()]	  ,  cplotwgts,c);
