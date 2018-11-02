@@ -66,7 +66,7 @@ case $WHAT in
             -o ${outdir}/${githash}/${EXTRA} \
             --farmappendix ${githash} \
             -q ${queue} --genWeights genweights_${githash}.root \
-            --era era2017 -m VBFVectorBoson::RunVBFVectorBoson --only SinglePhoton --ch 0 --runSysts ${extraOpts};
+            --era era2017 -m VBFVectorBoson::RunVBFVectorBoson --only SinglePhoton_2017F --ch 0 --runSysts ${extraOpts};
 	;;
         #extraOpts=" --mvatree"
 

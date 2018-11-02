@@ -542,6 +542,10 @@ void VBFVectorBoson::bookHistograms(){
   ht->addHist("multfwdj", 	  new TH2F("multfwdj",           ";N_{constit} fwd jet; #eta_{j}",20,0,20,25,0,5)); 
   ht->addHist("sfcentj", 	  new TH2F("sfcentj",          ";SF cent jet; #eta_{j}",50,0,2,25,0,5));  
   ht->addHist("sffwdj", 	  new TH2F("sffwdj",           ";SF fwd jet; #eta_{j}",50,0,2,25,0,5));  
+  ht->addHist("vptcentj", 	  new TH2F("vptcentj",           ";Photon p_{T}; #eta_{j}",90,50,500,25,0,5));  
+  ht->addHist("vIdcentj", 	  new TH2F("vIdcentj",           ";Photon Id; #eta_{j}",2,0,2,25,0,5));  
+  ht->addHist("nvcentj", 	  new TH2F("nvcentj",           ";Photon mult.; #eta_{j}",20,0,20,25,0,5));  
+  ht->addHist("njcentj", 	  new TH2F("njcentj",           ";Jet mult; #eta_{j}",20,0,20,25,0,5));  
   //additional variables from https://link.springer.com/content/pdf/10.1140/epjc/s10052-017-5315-6.pdf
   ht->addHist("jjetas", 	  new TH1F("jjetas",          ";#eta_{j1}#eta_{j2};Events",200,-25,25));  
   ht->addHist("centjy",		  new TH1F("centjy",          ";Central jet rapidity;Jets",25,0,3));  
@@ -754,6 +758,12 @@ void VBFVectorBoson::fill(MiniEvent_t ev, TLorentzVector boson, std::vector<Jet>
     ht->fill("ptcentj",    jets[idxCent].Pt(),                      fabs(jets[idxCent].Eta()), cplotwgts,c);    
     ht->fill("multcentj",  ev.j_mult[jets[idxCent].getJetIndex()],  fabs(jets[idxCent].Eta()), cplotwgts,c);  
     ht->fill("sfcentj",    ev.j_rawsf[jets[idxCent].getJetIndex()], fabs(jets[idxCent].Eta()), cplotwgts,c);    
+    ht->fill("vptcentj",   boson.Pt(),                              fabs(jets[idxCent].Eta()), cplotwgts,c);
+    int pId = 0;
+    if(selector->isTight(ev, photons[0].originalReference())) pId = 1;
+    ht->fill("vIdcentj",   pId,                                     fabs(jets[idxCent].Eta()), cplotwgts,c);
+    ht->fill("nvcentj",    photons.size(),                          fabs(jets[idxCent].Eta()), cplotwgts,c);
+    ht->fill("njcentj",    jets.size(),                             fabs(jets[idxCent].Eta()), cplotwgts,c);
   }
   if(jets.size() >= 2){
     jjetas = jets[0].Eta()*jets[1].Eta();
